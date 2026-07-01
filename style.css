@@ -391,30 +391,36 @@ header p {
     border: 1px solid var(--glass-border);
     border-radius: 16px;
     padding: 0.75rem 1rem;
+    flex-wrap: wrap; /* Chromebook/Mobile compatibility */
 }
 
 .settings-label {
     font-size: 0.9rem;
     font-weight: 500;
     color: #94a3b8;
+    white-space: nowrap;
 }
 
 .mode-selector {
     display: flex;
     gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .mode-btn {
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.1);
     color: #94a3b8;
-    padding: 0.4rem 1rem;
+    padding: 0.5rem 1.2rem;
     border-radius: 8px;
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     font-family: inherit;
+    white-space: nowrap;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .mode-btn:hover {
@@ -434,9 +440,11 @@ header p {
     display: flex;
     gap: 0.75rem;
     justify-content: center;
+    align-items: stretch; /* Aligns input and button heights */
     max-width: 400px;
     margin: 1.5rem auto 0;
     animation: fadeIn 0.3s ease;
+    width: 100%;
 }
 
 .input-section input {
@@ -445,17 +453,29 @@ header p {
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     color: var(--text-light);
-    padding: 0.75rem 1rem;
+    padding: 0 1rem;
+    height: 48px; /* Fixed height for consistency */
     font-size: 1.1rem;
     font-weight: 600;
     font-family: inherit;
     text-transform: uppercase;
     text-align: center;
     transition: all 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
 }
 
 .input-section input:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.input-section .btn {
+    height: 48px; /* Matches input height exactly */
+    padding: 0 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
 }
