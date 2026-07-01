@@ -1,4 +1,5 @@
 let climateData = [];
+let answerMode = 'choice';
 let currentQuestion = null;
 let chartInstance = null;
 
@@ -36,6 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-hint').addEventListener('click', showHint);
     document.getElementById('btn-next').addEventListener('click', nextQuestion);
+    
+    // Input mode events
+    document.getElementById('btn-submit-answer').addEventListener('click', submitInputAnswer);
+    document.getElementById('answer-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            submitInputAnswer();
+        }
+    });
 });
 
 async function fetchData() {
@@ -64,6 +73,14 @@ function nextQuestion() {
     document.getElementById('result-message').classList.add('hidden');
     document.getElementById('explanation-container').classList.add('hidden');
     
+    // Reset input field styling
+    const inputField = document.getElementById('answer-input');
+    inputField.value = '';
+    inputField.disabled = false;
+    inputField.style.borderColor = 'var(--glass-border)';
+    inputField.style.background = 'rgba(15, 23, 42, 0.5)';
+    document.getElementById('btn-submit-answer').disabled = false;
+    
     // Select random station
     const randomIndex = Math.floor(Math.random() * climateData.length);
     currentQuestion = climateData[randomIndex];
@@ -73,6 +90,10 @@ function nextQuestion() {
 
     // Generate Options
     generateOptions();
+    
+    if (answerMode === 'input') {
+        setTimeout(() => inputField.focus(), 10);
+    }
 }
 
 function renderChart(data) {
@@ -188,21 +209,32 @@ function generateOptions() {
 
 function checkAnswer(selectedType, btnElement) {
     const correctType = currentQuestion.koppen;
-    const isCorrect = selectedType === correctType;
+    const isCorrect = selectedType.toUpperCase() === correctType.toUpperCase();
     
     // Disable all buttons
     const allBtns = document.querySelectorAll('.option-btn');
     allBtns.forEach(b => {
         b.disabled = true;
-        if (b.textContent === correctType) {
+        if (b.textContent.toUpperCase() === correctType.toUpperCase()) {
             b.classList.add('correct');
         }
     });
 
-    if (!isCorrect) {
-        btnElement.classList.add('wrong');
+    if (btnElement) {
+        if (!isCorrect) {
+            btnElement.classList.add('wrong');
+        }
+    } else {
+        const inputField = document.getElementById('answer-input');
+        if (isCorrect) {
+            inputField.style.borderColor = 'var(--success)';
+            inputField.style.background = 'rgba(16, 185, 129, 0.15)';
+        } else {
+            inputField.style.borderColor = 'var(--error)';
+            inputField.style.background = 'rgba(239, 68, 68, 0.15)';
+        }
     }
-
+    
     // Show result message
     const msgElement = document.getElementById('result-message');
     msgElement.classList.remove('hidden', 'success', 'error');
@@ -211,15 +243,16 @@ function checkAnswer(selectedType, btnElement) {
     
     if (isCorrect) {
         msgElement.classList.add('success');
-        msgElement.innerHTML = `正解！<br>ここは <strong>${currentQuestion.station} (${currentQuestion.country})</strong> です。<br>気候区分は <strong>${correctType} (${desc})</strong> です。`;
+        msgElement.innerHTML = "正解！<br>ここは <strong>" + currentQuestion.station + " (" + currentQuestion.country + ")</strong> です。<br>気候区分は <strong>" + correctType + " (" + desc + ")</strong> です。";
     } else {
         msgElement.classList.add('error');
-        msgElement.innerHTML = `残念！<br>ここは <strong>${currentQuestion.station} (${currentQuestion.country})</strong> です。<br>正解は <strong>${correctType} (${desc})</strong> でした。`;
+        const typedPart = btnElement ? "" : " あなたの回答: <strong>" + selectedType.toUpperCase() + "</strong><br>";
+        msgElement.innerHTML = "残念！<br>" + typedPart + "ここは <strong>" + currentQuestion.station + " (" + currentQuestion.country + ")</strong> です。<br>正解は <strong>" + correctType + " (" + desc + ")</strong> でした。";
     }
 
     // Show hint section and update controls
     document.getElementById('hint-section').classList.remove('hidden');
-    document.getElementById('location-hint').textContent = `${currentQuestion.station}, ${currentQuestion.country}`;
+    document.getElementById('location-hint').textContent = currentQuestion.station + ", " + currentQuestion.country;
     document.getElementById('btn-hint').classList.add('hidden');
     document.getElementById('btn-next').classList.remove('hidden');
 
@@ -521,4 +554,45 @@ function getKoppenExplanation(data) {
     );
     
     return explanationSteps.join("");
+}
+
+
+function setAnswerMode(mode) {
+    answerMode = mode;
+    
+    // Toggle active classes on buttons
+    document.getElementById('mode-choice').classList.toggle('active', mode === 'choice');
+    document.getElementById('mode-input').classList.toggle('active', mode === 'input');
+    
+    // Show/hide sections
+    const optionsGrid = document.getElementById('options-grid');
+    const inputSection = document.getElementById('input-section');
+    
+    if (mode === 'choice') {
+        optionsGrid.classList.remove('hidden');
+        inputSection.classList.add('hidden');
+    } else {
+        optionsGrid.classList.add('hidden');
+        inputSection.classList.remove('hidden');
+        
+        // Reset and focus input field
+        const inputField = document.getElementById('answer-input');
+        inputField.value = '';
+        inputField.disabled = false;
+        inputField.style.borderColor = 'var(--glass-border)';
+        inputField.style.background = 'rgba(15, 23, 42, 0.5)';
+        document.getElementById('btn-submit-answer').disabled = false;
+        inputField.focus();
+    }
+}
+
+function submitInputAnswer() {
+    const inputField = document.getElementById('answer-input');
+    const selectedType = inputField.value.trim();
+    if (!selectedType) return;
+    
+    inputField.disabled = true;
+    document.getElementById('btn-submit-answer').disabled = true;
+    
+    checkAnswer(selectedType, null);
 }

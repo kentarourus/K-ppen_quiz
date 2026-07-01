@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="https://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>気象庁｜世界の天候データツール</title>
+<meta name="Author" content="気象庁 Japan Meteorological Agency" />
+<meta name="keywords" content="気象庁 Japan Meteorological Agency" />
+<meta name="description" content="気象庁が提供するページです" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<link rel="stylesheet" type="text/css" href="/com/css/define.css" media="all" />
+<script type="text/javascript" src="/com/js/jquery.js"></script>
+<style type="text/css" media="all"><!-- @import url(/com/default.css); --></style>
+<link rel="stylesheet" type="text/css" href="main.css">
+<style type="text/css"> 
+<!--
+    #contents_area2 #ncontents2 #main2{
+        clear:both;
+        float:left;
+        width:1000px;
+    }
+    /*fieldset {
+    padding:5px 10px;
+    width:1002px;
+    }*/
+    embed {
+    padding:0;
+    border-style:solid;
+    border-width:1px;
+    border-color:#cccccc;
+    }
+ 
+    .yrmn {
+        background-color:#f0fcff;
+        //border-style:solid;i
+        //border-width:1px;i
+        border-color:#a0c0fa;i
+        //margin-left:5px;i
+        //padding:5px;
+    }
+ 
+ 
+ 
+  fieldset#id1 {
+    background-color: #FFFFFF;
+  }
+  fieldset#id2 {
+    background-color: #FFFFFF;
+  }
+/* ヘッダー整理（2019.2.5）3月22日以降削除
+******************************************************/
+#header2_right{
+      width: 800px;
+      float: right;
+      padding: 5px 0 0;
+}
+
+#header2_link{
+      float: right;
+      width: auto;
+}
+
+#header2_link ul {
+      list-style:none;
+      padding: 20px 0 0;
+      font-size:1.2em;
+}
+
+#header2_link ul li{
+      float:left;
+      margin:0 0 0 15px;
+      display:inline;
+}
+#header2_link ul li a{
+      background-image:url(../images/icon_arrow02.gif);
+      background-position:0 0;
+      background-repeat:no-repeat;
+      padding:0 0 0 18px;
+}
+/* Googleカスタムサーチ（2019.2.12）3月22日以降削除
+******************************************************/
+#gsearch{
+      float:right;
+      margin:0;
+      clear: both;
+      width: 275px;
+      text-align: right;
+}
+
+#gsearch p{
+      margin:0;
+      line-height:1;
+}
+
+#gsearch form{
+      margin:0;
+      padding:6px 0;
+}
+
+#gsearch form input{
+      vertical-align:middle;
+      margin:0;
+}
+
+#gsearch img {
+      display: none;
+}
+
+
+-->
+</style>
+
+<script type="text/javascript">
+<!--
+function obj1(s,rnow,y,m){
+
+ document.menu.y.options[document.menu.y.selectedIndex].value=y;
+ document.menu.m.options[document.menu.m.selectedIndex].value=m;
+ obj5(s,rnow);
+
+}
+
+function obj5(s,rnow) {
+  var r;
+  var top;
+  var left;
+  var scale;
+  var reg;
+  var mapkind;
+  var k;
+  var i;
+  var e;
+  var elm;
+  var d;
+
+  var y=document.menu.y.options[document.menu.y.selectedIndex].value;
+  y=parseInt(y);
+  var m=document.menu.m.options[document.menu.m.selectedIndex].value;
+  m=parseInt(m);
+  scale=parseInt(s);
+
+  r=document.menu.r.options[document.menu.r.selectedIndex].value;
+  reg=parseInt(r);
+  
+  e=document.menu.e.options[document.menu.e.selectedIndex].value;
+  elm=parseInt(e);
+
+  if (e==""){
+    return;
+  }
+
+  if(e<=8){
+    d=0;
+  }else if(e==9){
+    d=1;
+  }else if(e==10){
+    d=2;
+  }
+
+   var top=( window.frames["mapframe"].document.body.scrollTop || window.frames["mapframe"].document.documentElement.scrollTop);
+   var left=( window.frames["mapframe"].document.body.scrollLeft ||window.frames["mapframe"].document.documentElement.scrollLeft);
+
+  var radioList=document.getElementsByName("k");
+  for(i=0; i<radioList.length; i++){
+   if(radioList[i].checked){
+     mapkind=parseInt(radioList[i].value);
+     break;
+   }
+  } 
+  if(r != rnow){
+  if (reg==0){
+    top=0;
+    left=0;
+    scale=1;
+  } else if (reg==1){
+    top=150;
+    left=760;
+    scale=3;
+  } else if (reg==2){
+    top=80;
+    left=0;
+    scale=3;
+  } else if (reg==3){
+    top=280;
+    left=0;
+    scale=2;
+  } else if (reg==4){
+    top=100;
+    left=1800;
+    scale=3;
+  } else if (reg==5){
+    top=420;
+    left=2000;
+    scale=2;
+  } else if (reg==6){
+    top=650;
+    left=800;
+    scale=3;
+  } else {
+    return;
+  }
+  }
+  location.href = 'frame.php?&s=' +  scale + '&r=' +  reg  + '&d=' +  d  + '&y=' + y + '&m=' + m + '&e=' + elm + '&t=' + top + '&l=' + left + '&k=' + mapkind + '&s=' + scale;
+}
+
+function obj6() {
+   var top=( window.frames["mapframe"].document.body.scrollTop || window.frames["mapframe"].document.documentElement.scrollTop);
+   var left=( window.frames["mapframe"].document.body.scrollLeft ||window.frames["mapframe"].document.documentElement.scrollLeft);
+   document.forms['menu'].elements['t'].value =top;
+   document.forms['menu'].elements['l'].value =left;
+
+}
+
+function obj10(e,y,m) {
+
+ var er=parseInt(e);
+ if(er>3){er=0;}
+ var url = '<a class="menu2" href="https://www.data.jma.go.jp/cpd/monitor/dailyview/index.php?y=' + y + '&m=' + m + '&d=1' +'&e=' + er + '" target = "_blank">&nbsp日別値マップの表示(新しいウィンドウが開きます)&raquo;&raquo;</a>&nbsp;&nbsp;' ;
+ return(url);
+}
+
+
+
+// -->
+</script>
+
+</head>
+
+<body>
+
+<noscript><div>すべての機能をご利用いただくにはJavascriptを有効にしてください。</div></noscript>
+<!--header start -->
+<div id="header_area">
+	<div id="nheader">
+		<div id="logo"><a href="//www.jma.go.jp/jma/index.html"><img src="//www.jma.go.jp/jma/com/images/logo.gif" alt="気象庁" width="120" height="67" /></a></div>
+		<div id="header2_right">
+			<div id="header2_link">
+				<ul>
+					<li xml:lang="en" lang="en"><a href="//www.jma.go.jp/jma/indexe.html">ENGLISH</a></li>
+				</ul>
+			</div>
+			<!-- search -->　
+			<div id="gsearch">
+				<form id="cse-search-box" action="//google.com/cse">
+					<input type="hidden" name="cx" value="009950868052057056798:0yrbmp7chwi" />
+					<input type="hidden" name="ie" value="UTF-8" />
+					<input type="text" name="q" />
+					<input type="image" name="sa" src="/jma/com/images/btn_search6.png" alt="検索"/>
+				</form>
+				<script type="text/javascript" src="//www.google.com/cse/brand?form=cse-search-box&lang=ja"></script>
+			</div>
+			<!-- search end-->
+		</div>
+		<ul id="gnavi">
+			<li><a href="//www.jma.go.jp/">ホーム</a></li>
+			<li><a href="//www.jma.go.jp/jma/menu/menuflash.html">防災情報</a></li>
+			<li><a href="//www.jma.go.jp/jma/menu/menureport.html"  class="on">各種データ・資料</a></li>
+			<li><a href="//www.jma.go.jp/jma/menu/areas.html">地域の情報</a></li>
+			<li><a href="//www.jma.go.jp/jma/menu/menuknowledge.html">知識・解説</a></li>
+			<li><a href="//www.jma.go.jp/jma/menu/menuappli.html">各種申請・ご案内</a></li>
+		</ul>
+	</div>
+</div>
+<!--header end -->
+
+
+<div id="contents_area2">
+	<div id="ncontents2">
+<!-- pankuzu menu -->
+		<ul class="breadcrumb2">
+			<li><a href="//www.jma.go.jp/">ホーム</a>&nbsp;&gt;&nbsp;</li>
+			<li><a href="//www.jma.go.jp/jma/menu/menureport.html">各種データ・資料</a>&nbsp;&gt;&nbsp;</li>
+			<li><a href="/cpdinfo/menu/index.html">地球環境・気候</a>&nbsp;&gt;&nbsp;</li>
+			<li><a href="../index.html">世界の天候</a>&nbsp;&gt;&nbsp;</li>
+			<li>世界の天候データツール（ClimatView 月統計値）</li>
+		</ul>
+<!-- //pankuzu menu -->
+<div id="main">
+<h1>世界の天候データツール（ClimatView 月統計値）</h1>
+<p>このページでは、気象庁が地上月気候値気象通報の受信を開始した1982年6月以降の世界各国の月平均気温・月降水量のデータやそれらの平年値、平年差（比）などを閲覧できます。図の観測地点のマークをクリックしてください。選択した地点のグラフと表を表示します。<br />&nbsp;&nbsp;<img src="./img/hatena_m.png" alt="使用方法" align="button"><a href="./explanation.html">使用方法について</a>
+<img src="./img/hatena_m.png" alt="SPIについて" align="button"><a href="./spi_commentary.html">干ばつの状況把握に用いる「標準化降水指数」について</a></p>
+<fieldset id="id1"><legend>&diams;選択フォーム</legend>
+<form name="menu" method="post" action="frame.php" style="margin:0 0 5px 0;">
+<input type="hidden" name="s" value="1">
+<input type="hidden" name="t" value="0.000000">
+<input type="hidden" name="l" value="0.000000">
+地域：<select name="r">
+<option value="0"  selected>世界</option>
+<option value="1" >アジア／シベリア</option>
+<option value="2" >ヨーロッパ／中東</option>
+<option value="3" >アフリカ／インド洋</option>
+<option value="4" >北アメリカ</option>
+<option value="5" >南アメリカ／ポリネシア</option>
+<option value="6" >東南アジア／オセアニア</option>
+</select>
+&nbsp;&nbsp;要素：<select name="e">
+<option value="0"  selected>月平均気温</option>
+<option value="1" >月平均最高気温</option>
+<option value="2" >月平均最低気温</option>
+<option value="3" >月降水量</option>
+<option value="4" >月平均気温平年差</option>
+<option value="5" >月降水量平年比</option>
+<option value="" >-------------</option><option value="6" >月平均気温平年値</option>
+<option value="7" >月降水量平年値</option>
+<option value="" >-------------</option><option value="8" >標準化降水指数(3か月)</option>
+<option value="9" >標準化降水指数(6か月)</option>
+<option value="10" >標準化降水指数(12か月)</option>
+</select>
+&nbsp;&nbsp;<button type="button" onclick="obj1(1,0,2025,5);">&lt;&lt;</button><button type="button" onclick="obj1(1,0,2026,4);">&lt;</button><select name="y">
+<option value="2026"  selected>2026</option>
+<option value="2025" >2025</option>
+<option value="2024" >2024</option>
+<option value="2023" >2023</option>
+<option value="2022" >2022</option>
+<option value="2021" >2021</option>
+<option value="2020" >2020</option>
+<option value="2019" >2019</option>
+<option value="2018" >2018</option>
+<option value="2017" >2017</option>
+<option value="2016" >2016</option>
+<option value="2015" >2015</option>
+<option value="2014" >2014</option>
+<option value="2013" >2013</option>
+<option value="2012" >2012</option>
+<option value="2011" >2011</option>
+<option value="2010" >2010</option>
+<option value="2009" >2009</option>
+<option value="2008" >2008</option>
+<option value="2007" >2007</option>
+<option value="2006" >2006</option>
+<option value="2005" >2005</option>
+<option value="2004" >2004</option>
+<option value="2003" >2003</option>
+<option value="2002" >2002</option>
+<option value="2001" >2001</option>
+<option value="2000" >2000</option>
+<option value="1999" >1999</option>
+<option value="1998" >1998</option>
+<option value="1997" >1997</option>
+<option value="1996" >1996</option>
+<option value="1995" >1995</option>
+<option value="1994" >1994</option>
+<option value="1993" >1993</option>
+<option value="1992" >1992</option>
+<option value="1991" >1991</option>
+<option value="1990" >1990</option>
+<option value="1989" >1989</option>
+<option value="1988" >1988</option>
+<option value="1987" >1987</option>
+<option value="1986" >1986</option>
+<option value="1985" >1985</option>
+<option value="1984" >1984</option>
+<option value="1983" >1983</option>
+<option value="1982" >1982</option>
+</select>年
+<select name="m">
+<option value="1" >1</option>
+<option value="2" >2</option>
+<option value="3" >3</option>
+<option value="4" >4</option>
+<option value="5"  selected>5</option>
+<option value="6" >6</option>
+<option value="7" >7</option>
+<option value="8" >8</option>
+<option value="9" >9</option>
+<option value="10" >10</option>
+<option value="11" >11</option>
+<option value="12" >12</option>
+</select>月
+<button type="button" onclick="obj1(1,0,2026,5);">&gt;</button><button type="button" onclick="obj1(1,0,2026,5);">&gt;&gt;</button></select>
+　地図解像度<input type="radio" name="k" value=0 checked>高<input type="radio" name="k" value=1>低&nbsp;<button type="button" onClick="obj5(1,0);" onkeypress="return true" style="background:#CC66FF; border-color:#FF0000">表示</button><div class="menubar"><a class="menu" href="list.php?r=0&y=2026&m=5&s=1&e=0&k=0">データリスト表示&nbsp;&raquo;</a><a class="menu" href="print.php?r=0&s=1&y=2026&m=5&e=0&t=0.000000&l=0.000000&k=0" target="blank">印刷用画面&nbsp;&raquo;</a><font size="-1">&nbsp;&nbsp;データリスト表示、印刷用画面ボタンは、表示ボタンを押してからご利用ください。</font>
+<div class="menubar"><script type="text/javascript">
+//<![PCDATA[
+document.write(obj10(0,2026,5));
+//]]>
+</script>
+</div>
+</form></fieldset>
+<table border="0"><tr><td><h3><font size="+1">2026年05月: [ 月平均気温(℃) ]</font></h3></td></tr></table>
+<div id="main2">
+<table border="0"><tr><td valign=top width=1000px  height=500px>
+<IFRAME id="mapid" name="mapframe" src="./map.php?r=0&s=1&d=0&y=2026&m=5&e=0&t=0.000000&l=0.000000&k=0" width="100%" height="100%" scrolling="auto" frameBorder="0" style="border: 1px #cccccc solid;" marginheight=0 marginwidth=0 ></IFRAME>
+</td><td valign="top"><img src="./cpt.php?e=0"></td></tr></table>
+</td></tr></table>
+</div>
+</div><!-- //contents -->
+
+<p class="totop"><a href="#nheader">このページのトップへ</a></p>
+</div>
+</div>
+
+<div id="footer_area">
+ <div id="nfooter">
+  <ul>
+   <li><a href="//www.jma.go.jp/jma/kishou/info/coment.html">気象庁ホームページについて</a></li>
+  </ul>
+ </div>
+</div>
+
+</body>
+</html>
+

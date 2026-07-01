@@ -1,0 +1,703 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="https://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>気象庁｜地点別データ・グラフ (世界の天候データツール（ClimatView 月統計値）)</title>
+<meta name="Author" content="気象庁 Japan Meteorological Agency" />
+<meta name="keywords" content="気象庁 Japan Meteorological Agency" />
+<meta name="description" content="気象庁が提供するページです" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<link rel="stylesheet" type="text/css" href="/com/css/define.css" media="all" />
+<script type="text/javascript" src="/com/js/jquery.js"></script>
+<style type="text/css" media="all"><!-- @import url(/com/default.css); --></style>
+<link rel="stylesheet" type="text/css" href="main.css">
+
+<script type="text/javascript">
+
+<!--
+
+//select forward/backward year/month
+function obj1(n,e,k,s,r,d,y,m){
+  document.menu.y.options[document.menu.y.selectedIndex].value=y;
+  document.menu.m.options[document.menu.m.selectedIndex].value=m;
+  obj9(n,e,k,s,r,d);
+}
+
+
+function obj9(n,e,k,s,r,d){
+ var stn=parseInt(n);
+ var scale=parseInt(s);
+ var reg=parseInt(r);
+ var mapkind=parseInt(k);
+ //var droughtperiod=parseInt(d);
+
+  var term=document.menu.p.options[document.menu.p.selectedIndex].value;
+  var y=document.menu.y.options[document.menu.y.selectedIndex].value;
+  var m=document.menu.m.options[document.menu.m.selectedIndex].value;
+  var droughtperiod=document.menu.d.options[document.menu.d.selectedIndex].value;
+ 
+ location.href ='graph_mkhtml.php?&n=' + stn + '&p=' + term + '&s=' +  scale + '&r=' +  reg  + '&y=' + y + '&m=' + m + '&e=' + e + '&k=' + mapkind + '&d=' + droughtperiod;
+}
+
+
+//map
+function obj7(k,r,s,e,y,m,lat,lon,ymapscale,xmapscale) {
+ var height=(document.body.clientHeight|| document.documentElement.clientHeight);
+ var width=(document.body.clientWidth||document.documentElement.clientWidth);
+ var scale=parseInt(s);
+ var reg=parseInt(r);
+ var ymapscale;
+ var xmapscale;
+
+ var mapkind=parseInt(k);
+ 
+ lat=(lat-90)*(-1)*ymapscale*scale;
+ if(lon<0){lon=lon+360;}
+ lon=lon+30;
+ if(lon>=360){lon=lon-360;}
+ lon=lon*xmapscale*scale;
+ height=height*0.81;
+ width=width*0.665;
+ var top=lat-(height/2.1);
+ var left=lon-(width/2.1);
+
+ if(e<=8){
+   d=0;
+ }else if(e==9){
+   d=1;
+ }else if(e==10){
+   d=2;}
+
+ var url ='<a class="menu" href="frame.php?s=' + scale + '&r=' + reg + '&d=' + d + '&y=' + y + '&m=' + m + '&e=' + e + '&t=' + top + '&l=' + left + '&k=' + mapkind + '">&laquo;&nbspマップ表示</a>' ;
+ return(url);
+}
+
+
+//日別データへのリンク（あとで修正する）
+function obj9d(n,e,k,s,r,y,m){
+ var stn=parseInt(n);
+ var scale=parseInt(s);
+ var reg=parseInt(r);
+ var mapkind=parseInt(k);
+
+ var url ='<a class="menu2" href="https://www.data.jma.go.jp/cpd/monitor/dailyview/graph_mkhtml_d.php?&n=' + stn + '&p=31' + '&s=' +  scale + '&r=' +  reg  + '&y=' + y + '&m=' + m + '&d=31' + '&e=' + e + '&k=' + mapkind + '" target = "_blank">日別値の表示（新しいウィンドウが開きます）&raquo;&raquo;</a>' ;
+ return(url);
+}
+
+
+
+
+
+// -->
+</script>
+<style type="text/css"> 
+<!--
+  fieldset {
+   padding:5px 10px;
+   width:800px;
+  }
+ 
+  .clear {
+   border-style:none;
+   background-color:transparent;
+   padding:0.6em 2em;
+  }
+  #center {
+   text-align:center;
+  }
+  #info {
+   background-color:#f0fcff;
+   border-style:solid;
+   border-width:2px;
+   border-color:#a0c0fa;
+   margin-top:5px;
+   margin-bottom:5px;
+   padding:5px;
+   width:600px;
+ 
+  }
+  embed {
+   margin-bottom:0em;
+  }
+ 
+
+
+  fieldset#id1 {
+    background-color: #FFFFFF;
+  }
+  fieldset#id2 {
+    background-color: #FFFFFF;
+  }
+/* ヘッダー整理（2019.2.5）3月22日以降削除
+******************************************************/
+#header2_right{
+      width: 800px;
+      float: right;
+      padding: 5px 0 0;
+}
+
+#header2_link{
+      float: right;
+      width: auto;
+}
+
+#header2_link ul {
+      list-style:none;
+      padding: 20px 0 0;
+      font-size:1.2em;
+}
+
+#header2_link ul li{
+      float:left;
+      margin:0 0 0 15px;
+      display:inline;
+}
+#header2_link ul li a{
+      background-image:url(../images/icon_arrow02.gif);
+      background-position:0 0;
+      background-repeat:no-repeat;
+      padding:0 0 0 18px;
+}
+/* Googleカスタムサーチ（2019.2.12）3月22日以降削除
+******************************************************/
+#gsearch{
+      float:right;
+      margin:0;
+      clear: both;
+      width: 275px;
+      text-align: right;
+}
+
+#gsearch p{
+      margin:0;
+      line-height:1;
+}
+
+#gsearch form{
+      margin:0;
+      padding:6px 0;
+}
+
+#gsearch form input{
+      vertical-align:middle;
+      margin:0;
+}
+
+#gsearch img {
+      display: none;
+}
+
+/* 削除対象ここまで
+******************************************************/
+
+-->
+</style>
+</head>
+<body>
+ 
+<noscript><div>すべての機能をご利用いただくにはJavascriptを有効にしてください。</div></noscript>
+<!--header start -->
+<div id="header_area">
+	<div id="nheader">
+		<div id="logo"><a href="//www.jma.go.jp/jma/index.html"><img src="//www.jma.go.jp/jma/com/images/logo.gif" alt="気象庁" width="120" height="67" /></a></div>
+		<div id="header2_right">
+			<div id="header2_link">
+				<ul>
+					<li xml:lang="en" lang="en"><a href="//www.jma.go.jp/jma/indexe.html">ENGLISH</a></li>
+				</ul>
+			</div>
+			<!-- search -->　
+			<div id="gsearch">
+				<form id="cse-search-box" action="//google.com/cse">
+					<input type="hidden" name="cx" value="009950868052057056798:0yrbmp7chwi" />
+					<input type="hidden" name="ie" value="UTF-8" />
+					<input type="text" name="q" />
+					<input type="image" name="sa" src="/jma/com/images/btn_search6.png" alt="検索"/>
+				</form>
+				<script type="text/javascript" src="//www.google.com/cse/brand?form=cse-search-box&lang=ja"></script>
+			</div>
+			<!-- search end-->
+		</div>
+		<ul id="gnavi">
+			<li><a href="//www.jma.go.jp/">ホーム</a></li>
+			<li><a href="//www.jma.go.jp/jma/menu/menuflash.html">防災情報</a></li>
+			<li><a href="//www.jma.go.jp/jma/menu/menureport.html"  class="on">各種データ・資料</a></li>
+			<li><a href="//www.jma.go.jp/jma/menu/areas.html">地域の情報</a></li>
+			<li><a href="//www.jma.go.jp/jma/menu/menuknowledge.html">知識・解説</a></li>
+			<li><a href="//www.jma.go.jp/jma/menu/menuappli.html">各種申請・ご案内</a></li>
+		</ul>
+	</div>
+</div>
+<!--header end -->
+
+
+<div id="contents_area2">
+	<div id="ncontents2">
+<!-- pankuzu menu -->
+		<ul class="breadcrumb2">
+			<li><a href="//www.jma.go.jp/">ホーム</a>&nbsp;&gt;&nbsp;</li>
+			<li><a href="//www.jma.go.jp/jma/menu/menureport.html">各種データ・資料</a>&nbsp;&gt;&nbsp;</li>
+			<li><a href="/cpdinfo/menu/index.html">地球環境・気候</a>&nbsp;&gt;&nbsp;</li>
+			<li><a href="../index.html">世界の天候</a>&nbsp;&gt;&nbsp;</li>
+			<li><a href="./frame.php">世界の天候データツール（ClimatView 月統計値）</a>&nbsp;&gt;&nbsp;</li>
+			<li>地点別データ・グラフ</li>
+		</ul>
+<!-- //pankuzu menu -->
+
+
+ 
+<!-- //global menu -->
+
+<div id="main">
+
+<h1>地点別データ・グラフ &nbsp; (世界の天候データツール（ClimatView 月統計値）)</h1>
+<form name="menu" method="post" action="graph_mkhtml.php" style="margin:0 0 5px 0;"><fieldset id="id1"><legend>&diams;選択フォーム</legend>
+<button type="button" onclick="obj1(20046,0,0,1,0,0,2024,5)">&lt;&lt;</button><button type="button" onclick="obj1(20046,0,0,1,0,0,2025,4)">&lt;</button><select name="y">
+<option value="2026" >2026</option>
+<option value="2025"  selected>2025</option>
+<option value="2024" >2024</option>
+<option value="2023" >2023</option>
+<option value="2022" >2022</option>
+<option value="2021" >2021</option>
+<option value="2020" >2020</option>
+<option value="2019" >2019</option>
+<option value="2018" >2018</option>
+<option value="2017" >2017</option>
+<option value="2016" >2016</option>
+<option value="2015" >2015</option>
+<option value="2014" >2014</option>
+<option value="2013" >2013</option>
+<option value="2012" >2012</option>
+<option value="2011" >2011</option>
+<option value="2010" >2010</option>
+<option value="2009" >2009</option>
+<option value="2008" >2008</option>
+<option value="2007" >2007</option>
+<option value="2006" >2006</option>
+<option value="2005" >2005</option>
+<option value="2004" >2004</option>
+<option value="2003" >2003</option>
+<option value="2002" >2002</option>
+<option value="2001" >2001</option>
+<option value="2000" >2000</option>
+<option value="1999" >1999</option>
+<option value="1998" >1998</option>
+<option value="1997" >1997</option>
+<option value="1996" >1996</option>
+<option value="1995" >1995</option>
+<option value="1994" >1994</option>
+<option value="1993" >1993</option>
+<option value="1992" >1992</option>
+<option value="1991" >1991</option>
+<option value="1990" >1990</option>
+<option value="1989" >1989</option>
+<option value="1988" >1988</option>
+<option value="1987" >1987</option>
+<option value="1986" >1986</option>
+<option value="1985" >1985</option>
+<option value="1984" >1984</option>
+<option value="1983" >1983</option>
+<option value="1982" >1982</option>
+</select>年
+<select name="m">
+<option value="1" >1</option>
+<option value="2" >2</option>
+<option value="3" >3</option>
+<option value="4" >4</option>
+<option value="5"  selected>5</option>
+<option value="6" >6</option>
+<option value="7" >7</option>
+<option value="8" >8</option>
+<option value="9" >9</option>
+<option value="10" >10</option>
+<option value="11" >11</option>
+<option value="12" >12</option>
+</select>月
+<button type="button" onclick="obj1(20046,0,0,1,0,0,2025,6)">&gt;</button><button type="button" onclick="obj1(20046,0,0,1,0,0,2026,5)">&gt;&gt;</button>&nbsp;&nbsp;グラフ表示期間:<select name="p"><option value="12">1年</option>
+<option value="24" selected>2年</option>
+<option value="60">5年</option>
+<option value="999">全ての年</option>
+</select>
+&nbsp;&nbsp;標準化降水指数対象期間:<select name="d"><option value="0" selected>3か月</option>
+<option value="1">6か月</option>
+<option value="2">12か月</option>
+<option value="3">すべて表示</option>
+</select>
+<input type="hidden" name="n" value="20046">
+<button type="button" onclick="obj9(20046,0,0,1,0,0);"  style="background:#CC66FF; border-color:#FF0000">表示</button><div class="menubar"><script type="text/javascript">
+//<![PCDATA[
+document.write(obj7(0,0,1,0,2025,5,80.620000,58.050000,2.777000,2.777000));
+ //]]>
+</script>
+<script type="text/javascript">
+//<![PCDATA[
+document.write(obj9d(20046,0,0,1,0,2025,5));
+ //]]>
+</script>
+</div></fieldset></form>
+<table><tr><tr>
+<td align="center">
+<img src="graph_mkimg.php?n=20046&y=2025&m=5&p=24&d=0" width="800" height="590" alt="graph">
+</td></tr>
+<tr><td align="center">
+</table>
+<div id="info"> POLARGMO IM. E.T. KRENKELJA -ロシア&nbsp;&nbsp;<br>
+緯度: 80.62 &deg;N / 経度: 58.05&deg;E&nbsp;&nbsp; 高度: 21(m)</div>
+<table><tr>
+<td><a href="./download.php?n=20046&ys=2023&ms=6&ye=2025&me=5"><img src="./img/download.png" width="127" height="38" align="button" alt="ファイルのダウンロード"></a></td><td align="middle">----CSVファイルでダウンロード </td>
+</tr></table>
+<table class="list">
+<tr>
+ <th class="list" rowspan="2">年月</th>
+ <th class="list" colspan="4">観測値</th>
+ <th class="list" colspan="2">平年値</th>
+ <th class="list" colspan="3">標準化降水指数</th>
+</tr><tr class="list">
+ <th class="list">月平均<br />気温<br />（℃）</th>
+ <th class="list">月平均<br />最高気温<br />（℃）</th>
+ <th class="list">月平均<br />最低気温<br />（℃）</th>
+ <th class="list">月降水量<br />（mm）</th>
+ <th class="list">月平均<br />気温<br />（℃）</th>
+ <th class="list">月降水量<br />（mm）</th>
+ <th class="list">3か月<br /></th>
+ <th class="list">6か月<br /></th>
+ <th class="list">12か月<br /></th>
+</tr>
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2023年6月</th>
+  <td class="list">-0.6</td>
+  <td class="list">0.5</td>
+  <td class="list">-1.7</td>
+  <td class="list">3</td>
+  <td class="list">-1.2</td>
+  <td class="list">12.7</td>
+  <td class="list"  >0.64</td>
+  <td class="list"  >1.33</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2023年7月</th>
+  <td class="list">1.0</td>
+  <td class="list">2.4</td>
+  <td class="list">-0.2</td>
+  <td class="list"></td>
+  <td class="list">0.7</td>
+  <td class="list">18.8</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2023年8月</th>
+  <td class="list">1.5</td>
+  <td class="list">3.4</td>
+  <td class="list">0.1</td>
+  <td class="list">27</td>
+  <td class="list">0.4</td>
+  <td class="list">23.7</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2023年9月</th>
+  <td class="list">-1.5</td>
+  <td class="list">0.0</td>
+  <td class="list">-2.6</td>
+  <td class="list">28</td>
+  <td class="list">-1.7</td>
+  <td class="list">27.1</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2023年10月</th>
+  <td class="list">-5.1</td>
+  <td class="list">-3.7</td>
+  <td class="list">-7.2</td>
+  <td class="list">27</td>
+  <td class="list">-8.0</td>
+  <td class="list">19.6</td>
+  <td class="list"  >0.35</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2023年11月</th>
+  <td class="list">-13.4</td>
+  <td class="list">-10.4</td>
+  <td class="list">-16.9</td>
+  <td class="list">17</td>
+  <td class="list">-13.6</td>
+  <td class="list">20.3</td>
+  <td class="list"  >-0.07</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2023年12月</th>
+  <td class="list">-15.4</td>
+  <td class="list">-12.5</td>
+  <td class="list">-18.4</td>
+  <td class="list">16</td>
+  <td class="list">-18.3</td>
+  <td class="list">29.0</td>
+  <td class="list"  >-0.26</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年1月</th>
+  <td class="list">-21.5</td>
+  <td class="list">-17.6</td>
+  <td class="list">-24.9</td>
+  <td class="list">48</td>
+  <td class="list">-20.1</td>
+  <td class="list">24.4</td>
+  <td class="list"  >0.08</td>
+  <td class="list"  >0.10</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年2月</th>
+  <td class="list">-11.2</td>
+  <td class="list">-8.0</td>
+  <td class="list">-14.9</td>
+  <td class="list">82</td>
+  <td class="list">-20.2</td>
+  <td class="list">28.7</td>
+  <td class="list"  >1.13</td>
+  <td class="list"  >0.72</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年3月</th>
+  <td class="list">-22.1</td>
+  <td class="list">-18.3</td>
+  <td class="list">-25.9</td>
+  <td class="list">64</td>
+  <td class="list">-20.6</td>
+  <td class="list">21.4</td>
+  <td class="list"  >1.91</td>
+  <td class="list"  >1.24</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年4月</th>
+  <td class="list">-17.9</td>
+  <td class="list">-15.2</td>
+  <td class="list">-20.4</td>
+  <td class="list">6</td>
+  <td class="list">-16.5</td>
+  <td class="list">15.9</td>
+  <td class="list"  >1.71</td>
+  <td class="list"  >0.98</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年5月</th>
+  <td class="list">-7.0</td>
+  <td class="list">-5.5</td>
+  <td class="list">-8.7</td>
+  <td class="list">7</td>
+  <td class="list">-7.8</td>
+  <td class="list">14.0</td>
+  <td class="list"  >0.95</td>
+  <td class="list"  >1.29</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年6月</th>
+  <td class="list"></td>
+  <td class="list"></td>
+  <td class="list"></td>
+  <td class="list"></td>
+  <td class="list">-1.2</td>
+  <td class="list">12.7</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年7月</th>
+  <td class="list">1.8</td>
+  <td class="list">3.7</td>
+  <td class="list">0.5</td>
+  <td class="list">13</td>
+  <td class="list">0.7</td>
+  <td class="list">18.8</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年8月</th>
+  <td class="list">2.9</td>
+  <td class="list">4.9</td>
+  <td class="list">1.2</td>
+  <td class="list">13</td>
+  <td class="list">0.4</td>
+  <td class="list">23.7</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年9月</th>
+  <td class="list">-0.8</td>
+  <td class="list">0.4</td>
+  <td class="list">-2.0</td>
+  <td class="list">50</td>
+  <td class="list">-1.7</td>
+  <td class="list">27.1</td>
+  <td class="list"  >0.23</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年10月</th>
+  <td class="list">-2.2</td>
+  <td class="list">-1.0</td>
+  <td class="list">-3.3</td>
+  <td class="list">34</td>
+  <td class="list">-8.0</td>
+  <td class="list">19.6</td>
+  <td class="list"  >0.86</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年11月</th>
+  <td class="list">-9.2</td>
+  <td class="list">-7.7</td>
+  <td class="list">-11.1</td>
+  <td class="list">19</td>
+  <td class="list">-13.6</td>
+  <td class="list">20.3</td>
+  <td class="list"  >0.62</td>
+  <td class="list" ></td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2024年12月</th>
+  <td class="list">-19.5</td>
+  <td class="list">-16.7</td>
+  <td class="list">-22.0</td>
+  <td class="list">24</td>
+  <td class="list">-18.3</td>
+  <td class="list">29.0</td>
+  <td class="list"  >0.17</td>
+  <td class="list"  >0.15</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2025年1月</th>
+  <td class="list">-17.4</td>
+  <td class="list">-14.5</td>
+  <td class="list">-20.5</td>
+  <td class="list">24</td>
+  <td class="list">-20.1</td>
+  <td class="list">24.4</td>
+  <td class="list"  >-0.19</td>
+  <td class="list"  >0.12</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2025年2月</th>
+  <td class="list">-14.0</td>
+  <td class="list">-11.5</td>
+  <td class="list">-15.1</td>
+  <td class="list">32</td>
+  <td class="list">-20.2</td>
+  <td class="list">28.7</td>
+  <td class="list"  >0.04</td>
+  <td class="list"  >0.28</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2025年3月</th>
+  <td class="list">-18.4</td>
+  <td class="list">-15.4</td>
+  <td class="list">-21.2</td>
+  <td class="list">32</td>
+  <td class="list">-20.6</td>
+  <td class="list">21.4</td>
+  <td class="list"  >0.29</td>
+  <td class="list"  >0.18</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr class="c">
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2025年4月</th>
+  <td class="list">-17.3</td>
+  <td class="list">-14.8</td>
+  <td class="list">-20.0</td>
+  <td class="list">33</td>
+  <td class="list">-16.5</td>
+  <td class="list">15.9</td>
+  <td class="list"  >0.79</td>
+  <td class="list"  >0.29</td>
+  <td class="list" ></td>
+ </tr> 
+ <tr>
+  <th class="list" style="padding-top:0;padding-bottom:0;">
+  2025年5月</th>
+  <td class="list">-4.4</td>
+  <td class="list">-2.5</td>
+  <td class="list">-5.9</td>
+  <td class="list">20</td>
+  <td class="list">-7.8</td>
+  <td class="list">14.0</td>
+  <td class="list"  >1.17</td>
+  <td class="list"  >0.59</td>
+  <td class="list" ></td>
+ </tr> 
+</table>
+<p>
+標準化降水指数が-1.0を下回った場合には、乾燥の程度に応じて表中のセルの背景色が変化します。また、標準化降水指数-9999（9999）は、当該期間において、発生頻度が極めて小さい少雨（多雨）の場合に表示されます。「発生頻度が極めて小さい」とは累積確率がゼロ（1）またはゼロ（1）に限りなく近いことを意味します。
+</p>
+<p>
+平年値は1991-2020年の30年間のデータの平均をもとに算出しています。
+</p>
+
+</div><!-- //contents -->
+
+<p class="totop"><a href="#nheader">このページのトップへ</a></p>
+</div>
+</div>
+
+<div id="footer_area">
+ <div id="nfooter">
+  <ul>
+   <li><a href="//www.jma.go.jp/jma/kishou/info/coment.html">気象庁ホームページについて</a></li>
+  </ul>
+ </div>
+</div>
+
+</body>
+</html>
+
