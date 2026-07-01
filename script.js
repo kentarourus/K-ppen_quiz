@@ -62,6 +62,7 @@ function nextQuestion() {
     document.getElementById('btn-next').classList.add('hidden');
     document.getElementById('btn-hint').classList.remove('hidden');
     document.getElementById('result-message').classList.add('hidden');
+    document.getElementById('explanation-container').classList.add('hidden');
     
     // Select random station
     const randomIndex = Math.floor(Math.random() * climateData.length);
@@ -221,10 +222,303 @@ function checkAnswer(selectedType, btnElement) {
     document.getElementById('location-hint').textContent = `${currentQuestion.station}, ${currentQuestion.country}`;
     document.getElementById('btn-hint').classList.add('hidden');
     document.getElementById('btn-next').classList.remove('hidden');
+
+    // Show explanation
+    const explanationContainer = document.getElementById('explanation-container');
+    const explanationContent = document.getElementById('explanation-content');
+    explanationContent.innerHTML = getKoppenExplanation(currentQuestion);
+    explanationContainer.classList.remove('hidden');
 }
 
 function showHint() {
     document.getElementById('hint-section').classList.remove('hidden');
     document.getElementById('location-hint').textContent = `${currentQuestion.station}, ${currentQuestion.country}`;
     document.getElementById('btn-hint').classList.add('hidden');
+}
+
+function getKoppenExplanation(data) {
+    const temps = data.temperature.map(Number);
+    const precips = data.precipitation.map(Number);
+    
+    const t_mean = temps.reduce((a, b) => a + b, 0) / 12;
+    const p_ann = precips.reduce((a, b) => a + b, 0);
+    
+    const maxTemp = Math.max(...temps);
+    const maxTempMonth = temps.indexOf(maxTemp) + 1;
+    const minTemp = Math.min(...temps);
+    const minTempMonth = temps.indexOf(minTemp) + 1;
+    
+    // Determine hemisphere based on warm half-year
+    const temp_h1 = temps.slice(3, 9).reduce((a, b) => a + b, 0); // Apr-Sep
+    const temp_h2 = temps.slice(0, 3).concat(temps.slice(9, 12)).reduce((a, b) => a + b, 0); // Oct-Mar
+    
+    const isNH = temp_h1 > temp_h2;
+    const hemisphere = isNH ? '北半球' : '南半球';
+    
+    let summer_precip, winter_precip, p_wmax, p_wmin, p_smax, p_smin;
+    let summer_months_text, winter_months_text;
+    
+    if (isNH) {
+        summer_precip = precips.slice(3, 9).reduce((a, b) => a + b, 0);
+        winter_precip = precips.slice(0, 3).concat(precips.slice(9, 12)).reduce((a, b) => a + b, 0);
+        p_wmax = Math.max(...precips.slice(0, 3).concat(precips.slice(9, 12)));
+        p_wmin = Math.min(...precips.slice(0, 3).concat(precips.slice(9, 12)));
+        p_smax = Math.max(...precips.slice(3, 9));
+        p_smin = Math.min(...precips.slice(3, 9));
+        summer_months_text = '4月〜9月';
+        winter_months_text = '10月〜3月';
+    } else {
+        summer_precip = precips.slice(0, 3).concat(precips.slice(9, 12)).reduce((a, b) => a + b, 0);
+        winter_precip = precips.slice(3, 9).reduce((a, b) => a + b, 0);
+        p_smax = Math.max(...precips.slice(0, 3).concat(precips.slice(9, 12)));
+        p_smin = Math.min(...precips.slice(0, 3).concat(precips.slice(9, 12)));
+        p_wmax = Math.max(...precips.slice(3, 9));
+        p_wmin = Math.min(...precips.slice(3, 9));
+        summer_months_text = '10月〜3月';
+        winter_months_text = '4月〜9月';
+    }
+    
+    const summer_ratio = (summer_precip / p_ann) * 100;
+    const winter_ratio = (winter_precip / p_ann) * 100;
+    
+    let p_th;
+    let threshold_type = "";
+    if (summer_precip >= 0.7 * p_ann) {
+        p_th = 20 * t_mean + 280;
+        threshold_type = "夏に雨が多い（夏雨型：" + summer_months_text + "の降水量が年間の70%以上）ため、乾燥限界値 = 20 × 年平均気温 + 280";
+    } else if (winter_precip >= 0.7 * p_ann) {
+        p_th = 20 * t_mean;
+        threshold_type = "冬に雨が多い（冬雨型：" + winter_months_text + "の降水量が年間の70%以上）ため、乾燥限界値 = 20 × 年平均気温";
+    } else {
+        p_th = 20 * t_mean + 140;
+        threshold_type = "降水量が年中平均している（年中湿潤・平均型）ため、乾燥限界値 = 20 × 年平均気温 + 140";
+    }
+    
+    let explanationSteps = [];
+    
+    explanationSteps.push(
+        "<div class=\"stat-summary\">" +
+            "<h4>観測データのまとめ</h4>" +
+            "<div class=\"stat-grid\">" +
+                "<div><span>年平均気温:</span> <strong>" + t_mean.toFixed(1) + " ℃</strong></div>" +
+                "<div><span>年降水量:</span> <strong>" + p_ann.toFixed(1) + " mm</strong></div>" +
+                "<div><span>最暖月気温:</span> <strong>" + maxTemp.toFixed(1) + " ℃</strong> (" + maxTempMonth + "月)</div>" +
+                "<div><span>最寒月気温:</span> <strong>" + minTemp.toFixed(1) + " ℃</strong> (" + minTempMonth + "月)</div>" +
+            "</div>" +
+        "</div>"
+    );
+
+    let stepNumber = 1;
+    
+    // Check E (Polar)
+    if (maxTemp < 10) {
+        explanationSteps.push(
+            "<div class=\"step-card\">" +
+                "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                "<h5>寒帯 (E) の判定</h5>" +
+                "<p>最暖月の平均気温が <strong>" + maxTemp.toFixed(1) + " ℃</strong> で、10℃未満です。</p>" +
+                "<p class=\"decision-met\">➔ <strong>寒帯 (E)</strong> に分類されます。</p>" +
+            "</div>"
+        );
+        
+        if (maxTemp < 0) {
+            explanationSteps.push(
+                "<div class=\"step-card\">" +
+                    "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                    "<h5>気候区分の決定</h5>" +
+                    "<p>最暖月の平均気温が <strong>" + maxTemp.toFixed(1) + " ℃</strong> で、0℃未満です。</p>" +
+                    "<p class=\"decision-met\">➔ <strong>氷雪気候 (EF)</strong> となります。</p>" +
+                "</div>"
+            );
+        } else {
+            explanationSteps.push(
+                "<div class=\"step-card\">" +
+                    "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                    "<h5>気候区分の決定</h5>" +
+                    "<p>最暖月の平均気温が <strong>" + maxTemp.toFixed(1) + " ℃</strong> で、0℃以上10℃未満です。</p>" +
+                    "<p class=\"decision-met\">➔ <strong>ツンドラ気候 (ET)</strong> となります。</p>" +
+                "</div>"
+            );
+        }
+        return explanationSteps.join("");
+    } else {
+        explanationSteps.push(
+            "<div class=\"step-card\">" +
+                "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                "<h5>寒帯 (E) の判定</h5>" +
+                "<p>最暖月の平均気温が <strong>" + maxTemp.toFixed(1) + " ℃</strong> で、10℃以上あります。</p>" +
+                "<p class=\"decision-not-met\">➔ 寒帯 (E) ではありません。</p>" +
+            "</div>"
+        );
+    }
+    
+    // Check B (Dry)
+    const isDry = p_ann < p_th;
+    explanationSteps.push(
+        "<div class=\"step-card\">" +
+            "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+            "<h5>乾燥帯 (B) の判定</h5>" +
+            "<p>半球判定: 気温の推移から <strong>" + hemisphere + "</strong> と判定されます。</p>" +
+            "<p>降水パターン判定: " + threshold_type + " = <strong>" + p_th.toFixed(1) + " mm</strong> となります。</p>" +
+            "<p>年降水量 <strong>" + p_ann.toFixed(1) + " mm</strong> と乾燥限界値 <strong>" + p_th.toFixed(1) + " mm</strong> を比較します。</p>" +
+            (isDry ? 
+                "<p class=\"decision-met\">➔ 年降水量が乾燥限界値未満であるため、<strong>乾燥帯 (B)</strong> に分類されます。</p>" : 
+                "<p class=\"decision-not-met\">➔ 年降水量が乾燥限界値以上であるため、乾燥帯 (B) ではありません。</p>"
+            ) +
+        "</div>"
+    );
+    
+    if (isDry) {
+        const isDesert = p_ann < 0.5 * p_th;
+        explanationSteps.push(
+            "<div class=\"step-card\">" +
+                "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                "<h5>砂漠 (BW) / ステップ (BS) の判定</h5>" +
+                "<p>年降水量が乾燥限界値の半分 (0.5 × P_th = <strong>" + (0.5 * p_th).toFixed(1) + " mm</strong>) 未満かどうかを判定します。</p>" +
+                (isDesert ?
+                    "<p class=\"decision-met\">➔ 限界値の半分未満のため、<strong>砂漠気候 (BW)</strong> です。</p>" :
+                    "<p class=\"decision-met\">➔ 限界値の半分以上のため、<strong>ステップ気候 (BS)</strong> です。</p>"
+                ) +
+            "</div>"
+        );
+        
+        const isHot = t_mean >= 18;
+        explanationSteps.push(
+            "<div class=\"step-card\">" +
+                "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                "<h5>温度区分の判定 (h/k)</h5>" +
+                "<p>年平均気温が <strong>" + t_mean.toFixed(1) + " ℃</strong> です。18℃以上かどうかを判定します。</p>" +
+                (isHot ?
+                    "<p class=\"decision-met\">➔ 18℃以上のため、高温型の <strong>h</strong> です。</p>" :
+                    "<p class=\"decision-met\">➔ 18℃未満のため、低温型の <strong>k</strong> です。</p>"
+                ) +
+                "<p class=\"decision-met\">➔ 結論: <strong>" + (isDesert ? 'BW' : 'BS') + (isHot ? 'h' : 'k') + " (" + (koppenDescriptions[(isDesert ? 'BW' : 'BS') + (isHot ? 'h' : 'k')] || '') + ")</strong> となります。</p>" +
+            "</div>"
+        );
+        return explanationSteps.join("");
+    }
+    
+    // Check A, C, D
+    let climateZone = "";
+    if (minTemp >= 18) {
+        climateZone = "A";
+        explanationSteps.push(
+            "<div class=\"step-card\">" +
+                "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                "<h5>熱帯・温帯・亜寒帯の判定</h5>" +
+                "<p>最寒月の平均気温が <strong>" + minTemp.toFixed(1) + " ℃</strong> です。これが18℃以上であるかを判定します。</p>" +
+                "<p class=\"decision-met\">➔ 18℃以上のため、<strong>熱帯 (A)</strong> に分類されます。</p>" +
+            "</div>"
+        );
+        
+        const p_min = Math.min(...precips);
+        const p_min_month = precips.indexOf(p_min) + 1;
+        const isAf = p_min >= 60;
+        
+        explanationSteps.push(
+            "<div class=\"step-card\">" +
+                "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                "<h5>熱帯の細分判定</h5>" +
+                "<p>最少雨月の降水量 (<strong>" + p_min.toFixed(1) + " mm</strong>, " + p_min_month + "月) を確認します。</p>" +
+                (isAf ?
+                    "<p class=\"decision-met\">➔ 最少雨月降水量が60mm以上のため、<strong>熱帯雨林気候 (Af)</strong> です。</p>" :
+                    "<p>最少雨月降水量が60mm未満です。モンスーン気候の閾値 (100 - 年降水量 / 25 = <strong>" + (100 - p_ann/25).toFixed(1) + " mm</strong>) と比較します。</p>" +
+                     (p_min >= 100 - p_ann / 25 ?
+                        "<p class=\"decision-met\">➔ 最少雨月降水量が閾値以上のため、<strong>熱帯モンスーン気候 (Am)</strong> です。</p>" :
+                        "<p class=\"decision-met\">➔ 最少雨月降水量が閾値未満のため、<strong>サバナ気候 (Aw)</strong> です。</p>"
+                     )
+                ) +
+            "</div>"
+        );
+        return explanationSteps.join("");
+    } else if (minTemp >= -3) {
+        climateZone = "C";
+        explanationSteps.push(
+            "<div class=\"step-card\">" +
+                "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                "<h5>熱帯・温帯・亜寒帯の判定</h5>" +
+                "<p>最寒月の平均気温が <strong>" + minTemp.toFixed(1) + " ℃</strong> です。これが -3℃以上18℃未満 の範囲にあるかを判定します。</p>" +
+                "<p class=\"decision-met\">➔ 範囲内のため、<strong>温帯 (C)</strong> に分類されます。</p>" +
+            "</div>"
+        );
+    } else {
+        climateZone = "D";
+        explanationSteps.push(
+            "<div class=\"step-card\">" +
+                "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                "<h5>熱帯・温帯・亜寒帯の判定</h5>" +
+                "<p>最寒月の平均気温が <strong>" + minTemp.toFixed(1) + " ℃</strong> です。これが -3℃未満かつ 最暖月平均気温が 10℃以上 であるかを判定します。</p>" +
+                "<p class=\"decision-met\">➔ 条件を満たすため、<strong>亜寒帯/冷帯 (D)</strong> に分類されます。</p>" +
+            "</div>"
+        );
+    }
+    
+    // Now determine 2nd letter (s/w/f) for C and D
+    let precipLetter = "f";
+    let precipExplanation = "";
+    
+    const isS = p_smin < 40 && p_smin < p_wmax / 3;
+    const isW = p_wmin < p_smax / 10;
+    
+    if (isS) {
+        precipLetter = "s";
+        precipExplanation = "夏期最少雨月の降水量 (<strong>" + p_smin.toFixed(1) + " mm</strong>) が40mm未満かつ冬期最多雨月の3分の1未満であるため、夏季乾燥の <strong>s</strong> となります。";
+    } else if (isW) {
+        precipLetter = "w";
+        precipExplanation = "冬期最少雨月の降水量 (<strong>" + p_wmin.toFixed(1) + " mm</strong>) が夏期最多雨月の10分の1未満であるため、冬季乾燥の <strong>w</strong> となります。";
+    } else {
+        precipLetter = "f";
+        precipExplanation = "乾燥条件（夏季乾燥 s、冬季乾燥 w）のどちらも満たさないため、湿潤の <strong>f</strong> となります。";
+    }
+    
+    explanationSteps.push(
+        "<div class=\"step-card\">" +
+            "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+            "<h5>降水パターンの判定 (s/w/f)</h5>" +
+            "<p>夏期（温暖な半年）の最少雨月降水量: <strong>" + p_smin.toFixed(1) + " mm</strong>, 冬期最多雨月: <strong>" + p_wmax.toFixed(1) + " mm</strong></p>" +
+            "<p>冬期（寒冷な半年）の最少雨月降水量: <strong>" + p_wmin.toFixed(1) + " mm</strong>, 夏期最多雨月: <strong>" + p_smax.toFixed(1) + " mm</strong></p>" +
+            "<p class=\"decision-met\">➔ " + precipExplanation + "</p>" +
+        "</div>"
+    );
+    
+    // Now determine 3rd letter (a/b/c/d)
+    let tempLetter = "c";
+    let tempExplanation = "";
+    const monthsAbove10 = temps.filter(t => t >= 10).length;
+    
+    if (maxTemp >= 22) {
+        tempLetter = "a";
+        tempExplanation = "最暖月の平均気温が <strong>" + maxTemp.toFixed(1) + " ℃</strong> で、22℃以上であるため <strong>a</strong> です。";
+    } else if (monthsAbove10 >= 4) {
+        tempLetter = "b";
+        tempExplanation = "最暖月が22℃未満ですが、10℃以上の月が <strong>" + monthsAbove10 + "ヶ月</strong> あり、4ヶ月以上であるため <strong>b</strong> です。";
+    } else {
+        if (climateZone === "D" && minTemp < -38) {
+            tempLetter = "d";
+            tempExplanation = "最暖月が22℃未満で10℃以上の月が <strong>" + monthsAbove10 + "ヶ月</strong> (4ヶ月未満) であり、さらに最寒月が -38℃未満 (<strong>" + minTemp.toFixed(1) + " ℃</strong>) であるため厳寒の <strong>d</strong> です。";
+        } else {
+            tempLetter = "c";
+            tempExplanation = "最暖月が22℃未満で10℃以上の月が <strong>" + monthsAbove10 + "ヶ月</strong> (4ヶ月未満) であるため <strong>c</strong> です。";
+        }
+    }
+    
+    explanationSteps.push(
+        "<div class=\"step-card\">" +
+            "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+            "<h5>気温による細分判定 (a/b/c/d)</h5>" +
+            "<p>最暖月平均気温: <strong>" + maxTemp.toFixed(1) + " ℃</strong>、10℃以上の月数: <strong>" + monthsAbove10 + "ヶ月</strong>" + (climateZone === "D" ? "、最寒月平均気温: <strong>" + minTemp.toFixed(1) + " ℃</strong>" : "") + "</p>" +
+            "<p class=\"decision-met\">➔ " + tempExplanation + "</p>" +
+        "</div>"
+    );
+    
+    const finalCode = climateZone + precipLetter + tempLetter;
+    explanationSteps.push(
+        "<div class='step-card final-decision'>" +
+            "<span class='step-badge success'>判定結果</span>" +
+            "<h5>気候区分の確定</h5>" +
+            "<p class='decision-met'>➔ 結論: <strong>" + finalCode + " (" + (koppenDescriptions[finalCode] || '') + ")</strong> となります。</p>" +
+        "</div>"
+    );
+    
+    return explanationSteps.join("");
 }
