@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Köppen Climate Quiz | ケッペンの気候区分クイズ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+    
+    <main class="container glass-panel">
+        <header>
+            <h1>Climate Challenge</h1>
+            <p>雨温図からケッペンの気候区分を当てよう！</p>
+        </header>
+
+        <div id="quiz-container">
+            <div class="chart-wrapper">
+                <canvas id="climograph"></canvas>
+            </div>
+            
+            <div id="hint-section" class="hidden">
+                <p><strong>Hint:</strong> <span id="location-hint"></span></p>
+            </div>
+
+            <div class="controls">
+                <button id="btn-hint" class="btn btn-secondary">ヒントを見る</button>
+                <button id="btn-next" class="btn btn-primary hidden">次の問題へ</button>
+            </div>
+
+            <div class="question-section">
+                <h3>この地点の気候区分は？</h3>
+                <div id="options-grid" class="options-grid">
+                    <!-- Options will be dynamically populated here -->
+                </div>
+            </div>
+
+            <div id="result-message" class="result-message hidden">
+                <!-- Result feedback -->
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>データを読み込み中...</p>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
