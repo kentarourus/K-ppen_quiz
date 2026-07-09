@@ -2,11 +2,26 @@ let climateData = [];
 let answerMode = 'choice';
 let currentQuestion = null;
 let chartInstance = null;
+let quizScope = localStorage.getItem('quizScope') || 'specialized';
+
+const highSchoolKoppenMap = {
+    'Af': 'Af', 'Am': 'Am', 'Aw': 'Aw', 'As': 'Aw',
+    'BWh': 'BW', 'BWk': 'BW', 'BSh': 'BS', 'BSk': 'BS',
+    'Cfa': 'Cfa', 'Cfb': 'Cfb', 'Cfc': 'Cfb',
+    'Csa': 'Cs', 'Csb': 'Cs', 'Csc': 'Cs',
+    'Cwa': 'Cw', 'Cwb': 'Cw', 'Cwc': 'Cw',
+    'Dfa': 'Df', 'Dfb': 'Df', 'Dfc': 'Df', 'Dfd': 'Df',
+    'Dwa': 'Dw', 'Dwb': 'Dw', 'Dwc': 'Dw', 'Dwd': 'Dw',
+    'Dsa': 'Df', 'Dsb': 'Df', 'Dsc': 'Df', 'Dsd': 'Df',
+    'ET': 'ET', 'EF': 'EF'
+};
 
 const koppenDescriptions = {
     'Af': '熱帯雨林気候',
     'Am': '熱帯モンスーン気候',
     'Aw': 'サバナ気候',
+    'BW': '砂漠気候',
+    'BS': 'ステップ気候',
     'BWh': '砂漠気候 (高温)',
     'BWk': '砂漠気候 (低温)',
     'BSh': 'ステップ気候 (高温)',
@@ -14,10 +29,14 @@ const koppenDescriptions = {
     'Cfa': '温暖湿潤気候',
     'Cfb': '西岸海洋性気候',
     'Cfc': '西岸海洋性気候 (短夏)',
+    'Cs': '地中海性気候',
+    'Cw': '温暖冬季少雨気候',
     'Csa': '地中海性気候 (高温)',
     'Csb': '地中海性気候 (温和)',
-    'Cwa': '温暖冬季少雨気候',
+    'Cwa': '温暖冬季少雨気候 (高温)',
     'Cwb': '温暖冬季少雨気候 (温和)',
+    'Df': '亜寒帯湿潤気候',
+    'Dw': '亜寒帯冬季少雨気候',
     'Dfa': '亜寒帯湿潤気候 (高温)',
     'Dfb': '亜寒帯湿潤気候 (温和)',
     'Dfc': '亜寒帯湿潤気候 (短夏)',
@@ -35,6 +54,12 @@ const koppenDescriptions = {
 document.addEventListener('DOMContentLoaded', () => {
     fetchData();
 
+    // Initialize scope select value
+    const scopeSelect = document.getElementById('scope-select');
+    if (scopeSelect) {
+        scopeSelect.value = quizScope;
+    }
+
     document.getElementById('btn-hint').addEventListener('click', showHint);
     document.getElementById('btn-next').addEventListener('click', nextQuestion);
     
@@ -43,6 +68,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('answer-input').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             submitInputAnswer();
+        }
+    });
+
+    // Close settings dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const trigger = document.querySelector('.settings-trigger');
+        const dropdown = document.getElementById('settings-dropdown');
+        if (trigger && dropdown && !trigger.contains(e.target) && !dropdown.classList.contains('hidden')) {
+            dropdown.classList.add('hidden');
         }
     });
 });
@@ -183,11 +217,11 @@ function generateOptions() {
     const grid = document.getElementById('options-grid');
     grid.innerHTML = '';
 
-    const correctType = currentQuestion.koppen;
+    const correctType = getDisplayKoppen(currentQuestion.koppen);
     const options = new Set([correctType]);
 
-    // Get all possible unique types from data
-    const allTypes = [...new Set(climateData.map(d => d.koppen))];
+    // Get all possible unique types from data, mapped to current scope
+    const allTypes = [...new Set(climateData.map(d => getDisplayKoppen(d.koppen)))];
 
     // Add 3 random incorrect options
     while(options.size < 4) {
@@ -208,7 +242,7 @@ function generateOptions() {
 }
 
 function checkAnswer(selectedType, btnElement) {
-    const correctType = currentQuestion.koppen;
+    const correctType = getDisplayKoppen(currentQuestion.koppen);
     const isCorrect = selectedType.toUpperCase() === correctType.toUpperCase();
     
     // Disable all buttons
@@ -425,7 +459,10 @@ function getKoppenExplanation(data) {
                     "<p class=\"decision-met\">➔ 18℃以上のため、高温型の <strong>h</strong> です。</p>" :
                     "<p class=\"decision-met\">➔ 18℃未満のため、低温型の <strong>k</strong> です。</p>"
                 ) +
-                "<p class=\"decision-met\">➔ 結論: <strong>" + (isDesert ? 'BW' : 'BS') + (isHot ? 'h' : 'k') + " (" + (koppenDescriptions[(isDesert ? 'BW' : 'BS') + (isHot ? 'h' : 'k')] || '') + ")</strong> となります。</p>" +
+                (quizScope === 'highschool' ?
+                    "<p class=\"decision-met\" style=\"color: var(--primary) !important;\">➔ 高校地理の範囲では h/k は区別しないため、<strong>" + (isDesert ? 'BW' : 'BS') + " (" + (koppenDescriptions[isDesert ? 'BW' : 'BS'] || '') + ")</strong> となります。</p>" :
+                    "<p class=\"decision-met\">➔ 結論: <strong>" + (isDesert ? 'BW' : 'BS') + (isHot ? 'h' : 'k') + " (" + (koppenDescriptions[(isDesert ? 'BW' : 'BS') + (isHot ? 'h' : 'k')] || '') + ")</strong> となります。</p>"
+                ) +
             "</div>"
         );
         return explanationSteps.join("");
@@ -534,22 +571,32 @@ function getKoppenExplanation(data) {
             tempExplanation = "最暖月が22℃未満で10℃以上の月が <strong>" + monthsAbove10 + "ヶ月</strong> (4ヶ月未満) であるため <strong>c</strong> です。";
         }
     }
+
+    const showStep5 = !(quizScope === 'highschool' && (climateZone === 'D' || precipLetter === 's' || precipLetter === 'w'));
     
-    explanationSteps.push(
-        "<div class=\"step-card\">" +
-            "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
-            "<h5>気温による細分判定 (a/b/c/d)</h5>" +
-            "<p>最暖月平均気温: <strong>" + maxTemp.toFixed(1) + " ℃</strong>、10℃以上の月数: <strong>" + monthsAbove10 + "ヶ月</strong>" + (climateZone === "D" ? "、最寒月平均気温: <strong>" + minTemp.toFixed(1) + " ℃</strong>" : "") + "</p>" +
-            "<p class=\"decision-met\">➔ " + tempExplanation + "</p>" +
-        "</div>"
-    );
+    if (showStep5) {
+        explanationSteps.push(
+            "<div class=\"step-card\">" +
+                "<span class=\"step-badge\">ステップ " + (stepNumber++) + "</span>" +
+                "<h5>気温による細分判定 (a/b/c/d)</h5>" +
+                "<p>最暖月平均気温: <strong>" + maxTemp.toFixed(1) + " ℃</strong>、10℃以上の月数: <strong>" + monthsAbove10 + "ヶ月</strong>" + (climateZone === "D" ? "、最寒月平均気温: <strong>" + minTemp.toFixed(1) + " ℃</strong>" : "") + "</p>" +
+                "<p class=\"decision-met\">➔ " + tempExplanation + "</p>" +
+            "</div>"
+        );
+    }
     
     const finalCode = climateZone + precipLetter + tempLetter;
+    const displayCode = getDisplayKoppen(finalCode);
+    let explanationText = "➔ 結論: <strong>" + finalCode + " (" + (koppenDescriptions[finalCode] || '') + ")</strong> となります。";
+    if (quizScope === 'highschool' && finalCode !== displayCode) {
+        explanationText += "<br><span style='color: var(--primary); font-weight: bold;'>※高校地理の範囲では、簡略化して <strong>" + displayCode + " (" + (koppenDescriptions[displayCode] || '') + ")</strong> として扱います。</span>";
+    }
+
     explanationSteps.push(
         "<div class='step-card final-decision'>" +
             "<span class='step-badge success'>判定結果</span>" +
             "<h5>気候区分の確定</h5>" +
-            "<p class='decision-met'>➔ 結論: <strong>" + finalCode + " (" + (koppenDescriptions[finalCode] || '') + ")</strong> となります。</p>" +
+            "<p class='decision-met'>" + explanationText + "</p>" +
         "</div>"
     );
     
@@ -595,4 +642,24 @@ function submitInputAnswer() {
     document.getElementById('btn-submit-answer').disabled = true;
     
     checkAnswer(selectedType, null);
+}
+
+function toggleSettingsDropdown() {
+    const dropdown = document.getElementById('settings-dropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('hidden');
+    }
+}
+
+function setScope(scope) {
+    quizScope = scope;
+    localStorage.setItem('quizScope', scope);
+    nextQuestion();
+}
+
+function getDisplayKoppen(code) {
+    if (quizScope === 'highschool') {
+        return highSchoolKoppenMap[code] || code;
+    }
+    return code;
 }

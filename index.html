@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Köppen Climate Quiz | ケッペンの気候区分クイズ</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,600,0,0" rel="stylesheet" />
     <link rel="stylesheet" href="style.css?v=2">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -14,7 +15,21 @@
         <div class="blob blob-2"></div>
     </div>
     
-    <main class="container glass-panel">
+    <main class="container glass-panel" style="position: relative;">
+        <div class="settings-trigger">
+            <button id="settings-toggle-btn" class="icon-btn" title="設定" onclick="toggleSettingsDropdown()">
+                <span class="material-symbols-rounded">settings</span>
+            </button>
+            <div id="settings-dropdown" class="settings-dropdown hidden">
+                <div class="dropdown-item">
+                    <label>範囲選択</label>
+                    <select id="scope-select" onchange="setScope(this.value)">
+                        <option value="highschool">高校範囲</option>
+                        <option value="specialized">専門範囲</option>
+                    </select>
+                </div>
+            </div>
+        </div>
         <header>
             <h1>Climate Challenge</h1>
             <p>雨温図からケッペンの気候区分を当てよう！</p>
