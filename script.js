@@ -2,7 +2,7 @@ let climateData = [];
 let answerMode = 'choice';
 let currentQuestion = null;
 let chartInstance = null;
-let quizScope = localStorage.getItem('quizScope') || 'specialized';
+let quizScope = localStorage.getItem('quizScope') || 'highschool';
 
 const highSchoolKoppenMap = {
     'Af': 'Af', 'Am': 'Am', 'Aw': 'Aw', 'As': 'Aw',
