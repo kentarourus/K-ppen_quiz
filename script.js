@@ -3,6 +3,7 @@ let answerMode = 'choice';
 let currentQuestion = null;
 let chartInstance = null;
 let quizScope = localStorage.getItem('quizScope') || 'highschool';
+let currentTheme = localStorage.getItem('quizTheme') || 'auto';
 
 const highSchoolKoppenMap = {
     'Af': 'Af', 'Am': 'Am', 'Aw': 'Aw', 'As': 'Aw',
@@ -60,6 +61,16 @@ document.addEventListener('DOMContentLoaded', () => {
         scopeSelect.value = quizScope;
     }
 
+    // Initialize theme select value and apply theme
+    const themeSelect = document.getElementById('theme-select');
+    if (themeSelect) {
+        themeSelect.value = currentTheme;
+        themeSelect.addEventListener('change', (e) => {
+            setTheme(e.target.value);
+        });
+    }
+    applyTheme(currentTheme);
+
     document.getElementById('btn-hint').addEventListener('click', showHint);
     document.getElementById('btn-next').addEventListener('click', nextQuestion);
     
@@ -77,6 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const dropdown = document.getElementById('settings-dropdown');
         if (trigger && dropdown && !trigger.contains(e.target) && !dropdown.classList.contains('hidden')) {
             dropdown.classList.add('hidden');
+        }
+    });
+
+    // Listen for OS theme changes when theme is set to 'auto'
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (currentTheme === 'auto' && chartInstance && currentQuestion) {
+            renderChart(currentQuestion);
         }
     });
 });
@@ -112,7 +130,7 @@ function nextQuestion() {
     inputField.value = '';
     inputField.disabled = false;
     inputField.style.borderColor = 'var(--glass-border)';
-    inputField.style.background = 'rgba(15, 23, 42, 0.5)';
+    inputField.style.background = 'var(--input-bg)';
     document.getElementById('btn-submit-answer').disabled = false;
     
     // Select random station
@@ -136,6 +154,16 @@ function renderChart(data) {
     if (chartInstance) {
         chartInstance.destroy();
     }
+
+    // Helper to get CSS variables dynamically
+    const getCssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+    const chartTextColor = getCssVar('--chart-text') || '#f8fafc';
+    const chartGridColor = getCssVar('--chart-grid') || 'rgba(255,255,255,0.05)';
+    const tooltipBgColor = getCssVar('--dropdown-bg') || 'rgba(15, 23, 42, 0.9)';
+    const tooltipTextColor = getCssVar('--text-light') || '#f8fafc';
+    const tooltipMutedColor = getCssVar('--text-muted') || '#cbd5e1';
+    const tooltipBorderColor = getCssVar('--glass-border') || 'rgba(255,255,255,0.1)';
 
     const labels = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
 
@@ -175,26 +203,26 @@ function renderChart(data) {
             },
             plugins: {
                 legend: {
-                    labels: { color: '#f8fafc' }
+                    labels: { color: chartTextColor }
                 },
                 tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                    titleColor: '#f8fafc',
-                    bodyColor: '#cbd5e1',
-                    borderColor: 'rgba(255,255,255,0.1)',
+                    backgroundColor: tooltipBgColor,
+                    titleColor: tooltipTextColor,
+                    bodyColor: tooltipMutedColor,
+                    borderColor: tooltipBorderColor,
                     borderWidth: 1
                 }
             },
             scales: {
                 x: {
-                    grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#94a3b8' }
+                    grid: { color: chartGridColor },
+                    ticks: { color: tooltipMutedColor }
                 },
                 'y-temp': {
                     type: 'linear',
                     position: 'left',
                     title: { display: true, text: '気温 (℃)', color: '#ef4444' },
-                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    grid: { color: chartGridColor },
                     ticks: { color: '#ef4444' },
                     suggestedMin: -30,
                     suggestedMax: 40
@@ -262,10 +290,10 @@ function checkAnswer(selectedType, btnElement) {
         const inputField = document.getElementById('answer-input');
         if (isCorrect) {
             inputField.style.borderColor = 'var(--success)';
-            inputField.style.background = 'rgba(16, 185, 129, 0.15)';
+            inputField.style.background = 'var(--success-bg)';
         } else {
             inputField.style.borderColor = 'var(--error)';
-            inputField.style.background = 'rgba(239, 68, 68, 0.15)';
+            inputField.style.background = 'var(--error-bg)';
         }
     }
     
@@ -627,7 +655,7 @@ function setAnswerMode(mode) {
         inputField.value = '';
         inputField.disabled = false;
         inputField.style.borderColor = 'var(--glass-border)';
-        inputField.style.background = 'rgba(15, 23, 42, 0.5)';
+        inputField.style.background = 'var(--input-bg)';
         document.getElementById('btn-submit-answer').disabled = false;
         inputField.focus();
     }
@@ -662,4 +690,29 @@ function getDisplayKoppen(code) {
         return highSchoolKoppenMap[code] || code;
     }
     return code;
+}
+
+function applyTheme(theme) {
+    const htmlEl = document.documentElement;
+    if (theme === 'light') {
+        htmlEl.classList.add('theme-light');
+        htmlEl.classList.remove('theme-dark');
+    } else if (theme === 'dark') {
+        htmlEl.classList.add('theme-dark');
+        htmlEl.classList.remove('theme-light');
+    } else {
+        htmlEl.classList.remove('theme-light', 'theme-dark');
+    }
+    
+    if (chartInstance && currentQuestion) {
+        setTimeout(() => {
+            renderChart(currentQuestion);
+        }, 50);
+    }
+}
+
+function setTheme(theme) {
+    currentTheme = theme;
+    localStorage.setItem('quizTheme', theme);
+    applyTheme(theme);
 }

@@ -1,6 +1,7 @@
 :root {
     --bg-dark: #0f172a;
     --text-light: #f8fafc;
+    --text-muted: #94a3b8;
     --glass-bg: rgba(30, 41, 59, 0.7);
     --glass-border: rgba(255, 255, 255, 0.1);
     --primary: #3b82f6;
@@ -11,6 +12,111 @@
     --error: #ef4444;
     --accent-1: #8b5cf6;
     --accent-2: #ec4899;
+
+    /* Extra theme specific elements */
+    --chart-bg: rgba(15, 23, 42, 0.5);
+    --chart-grid: rgba(255, 255, 255, 0.05);
+    --chart-text: #f8fafc;
+    --stat-summary-bg: rgba(15, 23, 42, 0.4);
+    --step-card-bg: rgba(255, 255, 255, 0.03);
+    --step-card-border: var(--secondary);
+    --step-card-text-muted: #94a3b8;
+    --step-card-title: #cbd5e1;
+    --explanation-title: #e2e8f0;
+    --settings-panel-bg: rgba(255, 255, 255, 0.02);
+    --input-bg: rgba(15, 23, 42, 0.5);
+    --dropdown-bg: rgba(15, 23, 42, 0.95);
+    --select-bg: rgba(255, 255, 255, 0.05);
+    --select-option-bg: #0f172a;
+    
+    --success-bg: rgba(16, 185, 129, 0.2);
+    --success-text: #34d399;
+    --success-border: rgba(16, 185, 129, 0.3);
+    --error-bg: rgba(239, 68, 68, 0.2);
+    --error-text: #f87171;
+    --error-border: rgba(239, 68, 68, 0.3);
+
+    --blob-opacity: 0.5;
+}
+
+/* Light mode class overrides */
+.theme-light {
+    --bg-dark: #f8fafc;
+    --text-light: #0f172a;
+    --text-muted: #475569;
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(15, 23, 42, 0.08);
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary: #e2e8f0;
+    --secondary-hover: #cbd5e1;
+    --accent-1: #c084fc;
+    --accent-2: #f472b6;
+
+    --chart-bg: rgba(255, 255, 255, 0.6);
+    --chart-grid: rgba(15, 23, 42, 0.05);
+    --chart-text: #0f172a;
+    --stat-summary-bg: rgba(15, 23, 42, 0.03);
+    --step-card-bg: rgba(15, 23, 42, 0.02);
+    --step-card-border: #cbd5e1;
+    --step-card-text-muted: #475569;
+    --step-card-title: #334155;
+    --explanation-title: #1e293b;
+    --settings-panel-bg: rgba(0, 0, 0, 0.015);
+    --input-bg: rgba(255, 255, 255, 0.8);
+    --dropdown-bg: rgba(255, 255, 255, 0.98);
+    --select-bg: rgba(0, 0, 0, 0.05);
+    --select-option-bg: #ffffff;
+
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --success-text: #065f46;
+    --success-border: rgba(16, 185, 129, 0.2);
+    --error-bg: rgba(239, 68, 68, 0.08);
+    --error-text: #991b1b;
+    --error-border: rgba(239, 68, 68, 0.2);
+
+    --blob-opacity: 0.18;
+}
+
+/* Auto theme system settings */
+@media (prefers-color-scheme: light) {
+    :root:not(.theme-dark) {
+        --bg-dark: #f8fafc;
+        --text-light: #0f172a;
+        --text-muted: #475569;
+        --glass-bg: rgba(255, 255, 255, 0.75);
+        --glass-border: rgba(15, 23, 42, 0.08);
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --secondary: #e2e8f0;
+        --secondary-hover: #cbd5e1;
+        --accent-1: #c084fc;
+        --accent-2: #f472b6;
+
+        --chart-bg: rgba(255, 255, 255, 0.6);
+        --chart-grid: rgba(15, 23, 42, 0.05);
+        --chart-text: #0f172a;
+        --stat-summary-bg: rgba(15, 23, 42, 0.03);
+        --step-card-bg: rgba(15, 23, 42, 0.02);
+        --step-card-border: #cbd5e1;
+        --step-card-text-muted: #475569;
+        --step-card-title: #334155;
+        --explanation-title: #1e293b;
+        --settings-panel-bg: rgba(0, 0, 0, 0.015);
+        --input-bg: rgba(255, 255, 255, 0.8);
+        --dropdown-bg: rgba(255, 255, 255, 0.98);
+        --select-bg: rgba(0, 0, 0, 0.05);
+        --select-option-bg: #ffffff;
+
+        --success-bg: rgba(16, 185, 129, 0.1);
+        --success-text: #065f46;
+        --success-border: rgba(16, 185, 129, 0.2);
+        --error-bg: rgba(239, 68, 68, 0.08);
+        --error-text: #991b1b;
+        --error-border: rgba(239, 68, 68, 0.2);
+
+        --blob-opacity: 0.18;
+    }
 }
 
 * {
@@ -45,7 +151,7 @@ body {
 .blob {
     position: absolute;
     filter: blur(80px);
-    opacity: 0.5;
+    opacity: var(--blob-opacity);
     border-radius: 50%;
     animation: float 10s infinite alternate ease-in-out;
 }
@@ -93,18 +199,18 @@ header {
 header h1 {
     font-size: 2.5rem;
     font-weight: 700;
-    background: linear-gradient(to right, var(--text-light), #cbd5e1);
+    background: linear-gradient(to right, var(--text-light), var(--text-muted));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.5rem;
 }
 
 header p {
-    color: #94a3b8;
+    color: var(--text-muted);
 }
 
 .chart-wrapper {
-    background: rgba(15, 23, 42, 0.5);
+    background: var(--chart-bg);
     border-radius: 16px;
     padding: 1rem;
     margin-bottom: 1.5rem;
@@ -177,7 +283,7 @@ header p {
 }
 
 .option-btn {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--select-bg);
     border: 1px solid var(--glass-border);
     color: var(--text-light);
     padding: 1rem;
@@ -189,7 +295,7 @@ header p {
 }
 
 .option-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(120, 120, 120, 0.15);
     transform: translateY(-2px);
 }
 
@@ -219,15 +325,15 @@ header p {
 }
 
 .result-message.success {
-    background: rgba(16, 185, 129, 0.2);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid var(--success-border);
 }
 
 .result-message.error {
-    background: rgba(239, 68, 68, 0.2);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: var(--error-bg);
+    color: var(--error-text);
+    border: 1px solid var(--error-border);
 }
 
 .loading {
@@ -241,7 +347,7 @@ header p {
 .spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid rgba(255, 255, 255, 0.1);
+    border: 4px solid var(--glass-border);
     border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -276,7 +382,7 @@ header p {
 .explanation-container {
     margin-top: 1.5rem;
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--settings-panel-bg);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
     animation: fadeIn 0.4s ease;
@@ -286,13 +392,13 @@ header p {
 .explanation-container h3 {
     font-size: 1.25rem;
     margin-bottom: 1rem;
-    color: #e2e8f0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--explanation-title);
+    border-bottom: 1px solid var(--glass-border);
     padding-bottom: 0.5rem;
 }
 
 .stat-summary {
-    background: rgba(15, 23, 42, 0.4);
+    background: var(--stat-summary-bg);
     border-radius: 12px;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -301,7 +407,7 @@ header p {
 .stat-summary h4 {
     font-size: 1rem;
     margin-bottom: 0.5rem;
-    color: #cbd5e1;
+    color: var(--step-card-title);
 }
 
 .stat-grid {
@@ -318,7 +424,7 @@ header p {
 
 .stat-grid div {
     font-size: 0.9rem;
-    color: #94a3b8;
+    color: var(--text-muted);
 }
 
 .stat-grid strong {
@@ -327,8 +433,8 @@ header p {
 
 .step-card {
     position: relative;
-    background: rgba(255, 255, 255, 0.03);
-    border-left: 3px solid var(--secondary);
+    background: var(--step-card-bg);
+    border-left: 3px solid var(--step-card-border);
     border-radius: 8px;
     padding: 1rem 1rem 1rem 1.25rem;
     margin-bottom: 0.75rem;
@@ -339,7 +445,7 @@ header p {
     top: 0.5rem;
     right: 0.75rem;
     font-size: 0.75rem;
-    background: var(--secondary);
+    background: var(--step-card-border);
     color: var(--text-light);
     padding: 0.15rem 0.5rem;
     border-radius: 4px;
@@ -349,12 +455,12 @@ header p {
 .step-card h5 {
     font-size: 0.95rem;
     margin-bottom: 0.5rem;
-    color: #cbd5e1;
+    color: var(--step-card-title);
 }
 
 .step-card p {
     font-size: 0.85rem;
-    color: #94a3b8;
+    color: var(--step-card-text-muted);
     line-height: 1.4;
     margin-bottom: 0.25rem;
 }
@@ -387,7 +493,7 @@ header p {
     align-items: center;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--settings-panel-bg);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
     padding: 0.75rem 1rem;
@@ -397,7 +503,7 @@ header p {
 .settings-label {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #94a3b8;
+    color: var(--text-muted);
     white-space: nowrap;
 }
 
@@ -409,8 +515,8 @@ header p {
 
 .mode-btn {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
     padding: 0.5rem 1.2rem;
     border-radius: 8px;
     font-size: 0.85rem;
@@ -424,7 +530,7 @@ header p {
 }
 
 .mode-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--select-bg);
     color: var(--text-light);
 }
 
@@ -449,7 +555,7 @@ header p {
 
 .input-section input {
     flex: 1;
-    background: rgba(15, 23, 42, 0.5);
+    background: var(--input-bg);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
     color: var(--text-light);
@@ -489,7 +595,7 @@ header p {
 }
 
 .icon-btn {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--select-bg);
     border: 1px solid var(--glass-border);
     color: var(--text-light);
     width: 40px;
@@ -512,7 +618,7 @@ header p {
     position: absolute;
     top: 48px;
     right: 0;
-    background: rgba(15, 23, 42, 0.95);
+    background: var(--dropdown-bg);
     backdrop-filter: blur(8px);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
@@ -531,12 +637,12 @@ header p {
 
 .dropdown-item label {
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: var(--text-muted);
     font-weight: 500;
 }
 
 .dropdown-item select {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--select-bg);
     border: 1px solid var(--glass-border);
     color: var(--text-light);
     padding: 6px 10px;
@@ -549,7 +655,7 @@ header p {
 }
 
 .dropdown-item select option {
-    background: #0f172a;
+    background: var(--select-option-bg);
     color: var(--text-light);
 }
 
