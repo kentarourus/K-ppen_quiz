@@ -135,6 +135,8 @@ body {
     align-items: center;
     overflow-x: hidden;
     position: relative;
+    padding: 2rem 0;
+    box-sizing: border-box;
 }
 
 /* Dynamic background blobs */
@@ -189,11 +191,13 @@ body {
     width: 90%;
     max-width: 800px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    margin: auto;
 }
 
 header {
     text-align: center;
     margin-bottom: 2rem;
+    padding: 0 40px;
 }
 
 header h1 {
@@ -278,7 +282,7 @@ header p {
 
 .options-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
 }
 
@@ -364,17 +368,65 @@ header p {
 }
 
 @media (max-width: 600px) {
+    body {
+        padding: 1rem 0;
+    }
+
     .glass-panel {
-        padding: 1.5rem;
+        padding: 1.25rem;
         width: 95%;
     }
     
+    header {
+        padding: 0 32px;
+        margin-bottom: 1rem;
+    }
+
     header h1 {
-        font-size: 2rem;
+        font-size: 1.75rem;
     }
     
+    .settings-panel {
+        margin-bottom: 1rem;
+    }
+
     .chart-wrapper {
-        height: 300px;
+        height: 250px;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+    }
+
+    .controls {
+        margin-bottom: 1rem;
+    }
+
+    .input-section {
+        margin-top: 1rem;
+    }
+
+    .options-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .option-btn {
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .explanation-container {
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .stat-summary {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .step-card {
+        padding: 0.75rem 0.75rem 0.75rem 1rem;
+        margin-bottom: 0.5rem;
     }
 }
 
