@@ -729,3 +729,27 @@ header p {
     color: var(--text-muted);
 }
 
+.climate-stats-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    background: var(--settings-panel-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+.climate-stats-container .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-light);
+}
+
+.climate-stats-container .stat-item span.material-symbols-rounded {
+    font-size: 1.25rem;
+}
+
