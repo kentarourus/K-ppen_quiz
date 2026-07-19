@@ -730,10 +730,9 @@ header p {
 }
 
 .climate-stats-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* デフォルトは4列横並び */
-    justify-items: center;
-    gap: 1rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
     background: var(--settings-panel-bg);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
@@ -747,30 +746,9 @@ header p {
     align-items: center;
     gap: 0.5rem;
     color: var(--text-light);
-    white-space: nowrap;
 }
 
 .climate-stats-container .stat-item span.material-symbols-rounded {
     font-size: 1.25rem;
-}
-
-/* 縦画面や画面幅が狭いデバイス用のレスポンシブ対応 */
-@media (max-width: 600px) {
-    .climate-stats-container {
-        grid-template-columns: repeat(2, 1fr); /* 2×2配列に変更 */
-        gap: 0.75rem 0.5rem;                    /* 横の隙間を狭くしてセル幅を確保 */
-        justify-items: start;
-        padding: 0.75rem 0.5rem;                /* 左右のパディングを狭くして余白を確保 */
-        font-size: 0.85rem;                     /* フォントサイズを少し縮小してはみ出し防止 */
-    }
-    
-    .climate-stats-container .stat-item {
-        margin: 0 auto;                         /* 各グリッドセル内で中央寄せ */
-        gap: 0.25rem;                           /* アイコンとテキストの間隔を少し狭める */
-    }
-    
-    .climate-stats-container .stat-item span.material-symbols-rounded {
-        font-size: 1.1rem;                      /* アイコンサイズも少し縮小 */
-    }
 }
 

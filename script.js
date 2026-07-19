@@ -142,8 +142,6 @@ function nextQuestion() {
     const precips = currentQuestion.precipitation.map(Number);
     const t_mean = temps.reduce((a, b) => a + b, 0) / 12;
     const p_ann = precips.reduce((a, b) => a + b, 0);
-    const maxTemp = Math.max(...temps);
-    const minTemp = Math.min(...temps);
 
     const statsContainer = document.getElementById('climate-stats');
     if (statsContainer) {
@@ -151,14 +149,6 @@ function nextQuestion() {
             <div class="stat-item">
                 <span class="material-symbols-rounded" style="color: #ef4444;">thermostat</span>
                 <span>年平均気温: <strong>${t_mean.toFixed(1)} ℃</strong></span>
-            </div>
-            <div class="stat-item">
-                <span class="material-symbols-rounded" style="color: #ffaa00;">sunny</span>
-                <span>最暖月気温: <strong>${maxTemp.toFixed(1)} ℃</strong></span>
-            </div>
-            <div class="stat-item">
-                <span class="material-symbols-rounded" style="color: #00aaff;">ac_unit</span>
-                <span>最寒月気温: <strong>${minTemp.toFixed(1)} ℃</strong></span>
             </div>
             <div class="stat-item">
                 <span class="material-symbols-rounded" style="color: #3b82f6;">rainy</span>
