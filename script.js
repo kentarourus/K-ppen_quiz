@@ -147,12 +147,18 @@ function nextQuestion() {
     if (statsContainer) {
         statsContainer.innerHTML = `
             <div class="stat-item">
-                <span class="material-symbols-rounded" style="color: #ef4444;">thermostat</span>
-                <span>年平均気温: <strong>${t_mean.toFixed(1)} ℃</strong></span>
+                <span class="material-symbols-rounded stat-icon" style="color: #ef4444;">thermostat</span>
+                <div class="stat-content">
+                    <span class="stat-label">年平均気温:</span>
+                    <strong class="stat-value">${t_mean.toFixed(1)} ℃</strong>
+                </div>
             </div>
             <div class="stat-item">
-                <span class="material-symbols-rounded" style="color: #3b82f6;">rainy</span>
-                <span>年降水量: <strong>${p_ann.toFixed(1)} mm</strong></span>
+                <span class="material-symbols-rounded stat-icon" style="color: #3b82f6;">rainy</span>
+                <div class="stat-content">
+                    <span class="stat-label">年降水量:</span>
+                    <strong class="stat-value">${p_ann.toFixed(1)} mm</strong>
+                </div>
             </div>
         `;
     }
